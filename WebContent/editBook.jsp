@@ -9,7 +9,7 @@
 			<form action="editBook" method="post">
 			
 				<input type="text" style="width: 400px;" name="title"
-					value='<%=b.getBookTitle() %>' class="form-control"
+					value='<%=b.getTitle() %>' class="form-control"
 					placeholder="Enter book title to Edit" required autofocus /><br />
 				
 				<input type="hidden" name="bookId" value=<%=b.getBookId()%>>

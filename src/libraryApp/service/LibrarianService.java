@@ -5,7 +5,6 @@ package libraryApp.service;
 
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ import libraryApp.data.BookDAO;
 import libraryApp.data.BranchDAO;
 import libraryApp.data.ConnectionUtils;
 import libraryApp.entity.Book;
-import libraryApp.entity.BookCopies;
 import libraryApp.entity.LibBranch;
 import libraryApp.exceptions.LibraryExceptions;
 
@@ -60,35 +58,40 @@ public class LibrarianService {
 
 	}
 
-	public void AddBookCopies(BookCopies bc) throws Exception{
-		new ConnectionUtils();
-		Connection con = ConnectionUtils.getConnetion();
-		BookDAO bD = new BookDAO(con);
-		BookCopiesDAO bcD = new BookCopiesDAO(con);
-		BranchDAO brD = new BranchDAO(con);
-		LibBranch br = new LibBranch();
-		Book b = new Book();
-		
-		br.setBranchId(bc.getBranch().getBranchId());
-		b.setBookId(bc.getBook().getBookId());
-		try {
-			LibBranch newBr = brD.read(br);
-			Book newB = bD.read(b);
-			if(newBr==null || newB==null){
-				throw new LibraryExceptions("Book or library branch cannot be null or blank.");
-			}else if(bc.getBranch().getBranchId() == 0 || bc.getBook().getBookId() == 0){
-				throw new LibraryExceptions("branch Id or bookId cannot be zero or match any branch");
-			}
-			bcD.update(bc);;
-			con.commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-			con.rollback();
-		}finally{
-			con.close();
-		}
-
-	}
+//	public void AddBookCopies(BookCopies bc) throws Exception{
+//		new ConnectionUtils();
+//		Connection con = ConnectionUtils.getConnetion();
+//		BookDAO bD = new BookDAO(con);
+//		BookCopiesDAO bcD = new BookCopiesDAO(con);
+//		BranchDAO brD = new BranchDAO(con);
+//		LibBranch br = new LibBranch();
+//		Book b = new Book();
+//		
+//		br.setBranchId(bc.getBranch().getBranchId());
+//		b.setBookId(bc.getBook().getBookId());
+//		try {
+//			LibBranch newBr = brD.read(br);
+//			Book newB = bD.read(b);
+//			if(newBr==null || newB==null){
+//				throw new LibraryExceptions("Book or library branch cannot be null or blank.");
+//			}else if(bc.getBranch().getBranchId() == 0 || bc.getBook().getBookId() == 0){
+//				throw new LibraryExceptions("branch Id or bookId cannot be zero or match any branch");
+//			}
+//			if(getNoOfCopyByBranch(bc.getBranch().getBranchId(), bc.getBook().getBookId()) == null){
+//				bcD.create(bc);
+//				con.commit();
+//			}else{
+//				bcD.update(bc);
+//				con.commit();
+//			}	
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			con.rollback();
+//		}finally{
+//			con.close();
+//		}
+//
+//	}
 	public List<Book> getAllBooksFromBranch(Integer branchId, Integer pageNo,String searchString) throws SQLException{
 		new ConnectionUtils();
 		Connection con = ConnectionUtils.getConnetion();
@@ -105,11 +108,10 @@ public class LibrarianService {
 	}
 		return bookList;
 	}
-	public int getNoOfCopyByBranch(Integer bookId, Integer branchId) throws SQLException{
+	public Integer getNoOfCopyByBranch(Integer branchId, Integer bookId) throws SQLException{
 		new ConnectionUtils();
 		Connection con = ConnectionUtils.getConnetion();
 		BookCopiesDAO bcD = new BookCopiesDAO(con);
-		ResultSet rs = (ResultSet) bcD.read(bookId, branchId);
-		return rs.getInt("noOfCopies");
+		return bcD.getNoCopyByBranch(branchId, bookId);
 	}
 }

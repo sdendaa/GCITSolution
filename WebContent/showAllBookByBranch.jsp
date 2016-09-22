@@ -13,20 +13,22 @@ LibBranch br = AdminstratorService.getIntance().getBranchById(branchId);
 /* System.out.println(br.getNoCopies().size()); */
 List<Book> books = libSer.getAllBooksFromBranch(branchId, null, null);
 %>
-
+<h2><%=br.getBranchName() %></h2>
 <table class="table" frame="box" rules="none">
 	<tr>
 		<th>Book Title</th>
-		<!-- <th>Number of copies</th>  -->
+		<th>Number of copies</th>  
 		<th>Select Book</th>
 		
 	</tr>
 	<%for(Book b: books){ 
 	%>
 	<tr>
-		<td><%out.println(b.getBookTitle()); %></td>
+		<td><%out.println(b.getTitle()); %></td>
+		<td><%out.println(libSer.getNoOfCopyByBranch(branchId, b.getBookId())); %></td>
 		<td>
-		<input type="button"  class="btn btn-md btn-success" value="Select" onclick="javascript:location.href='addNoCopies.jsp?bookId=<%=b.getBookId()%>&branchId=<%=branchId%>'">
+		<input type="button"  class="btn btn-md btn-success" value="addCopy"
+		 onclick="javascript:location.href='addNoCopiesLibr.jsp?bookId=<%=b.getBookId()%>&branchId=<%=branchId%>'">
 		</td>
 	</tr>
 	<%} %>

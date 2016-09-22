@@ -51,14 +51,17 @@ public class AdminstratorService {
 		new ConnectionUtils();
 		Connection myCon = ConnectionUtils.getConnetion();
 		BookDAO bDAO = new BookDAO(myCon);
+		//BookCopiesDAO bcDAO = new BookCopiesDAO(myCon);
 
 		try {
-			if(b == null ||b.getBookTitle() == null|| b.getBookTitle().trim().length()==0){
+			if(b == null ||b.getTitle() == null|| b.getTitle().trim().length()==0){
 				throw new LibraryExceptions("Book cannot be null or blank");
-			}else if(b.getBookTitle().trim().length() > 45){
+			}else if(b.getTitle().trim().length() > 45){
 				throw new LibraryExceptions("Book title cannot more than 45 chars");
 			}
+			//bDAO.create(b, a);
 			bDAO.create(b);
+			//bcDAO.create(bc);
 			myCon.commit();
 		} catch (Exception e) {
 			myCon.rollback();
@@ -66,6 +69,51 @@ public class AdminstratorService {
 		}finally{
 			myCon.close();
 		}
+	}
+	
+	public Integer addAndGetBookId(Book b) throws Exception{
+		new ConnectionUtils();
+		Integer bookId=0;
+		Connection myCon = ConnectionUtils.getConnetion();
+		Book book=new Book();
+		BookDAO bDAO = new BookDAO(myCon);
+		//BookCopiesDAO bcDAO = new BookCopiesDAO(myCon);
+
+		try {
+			if(b == null ||b.getTitle() == null|| b.getTitle().trim().length()==0){
+				throw new LibraryExceptions("Book cannot be null or blank");
+			}else if(b.getTitle().trim().length() > 45){
+				throw new LibraryExceptions("Book title cannot more than 45 chars");
+			}
+			//bDAO.create(b, a);
+			bookId = bDAO.createAndGetId(b);
+			//bcDAO.create(bc);
+			book.setBookId(bookId);
+			book.setAuthor(b.getAuthor());
+			bDAO.createBookAuthor(book);
+			myCon.commit();
+		} catch (Exception e) {
+			myCon.rollback();
+			throw e;
+		}finally{
+			myCon.close();
+		}
+		return bookId;
+	}
+	
+	
+	public void addNoCopies(BookCopies bc) throws SQLException{
+		new ConnectionUtils();
+		Connection con = null;
+		try{
+			con = ConnectionUtils.getConnetion();
+			BookCopiesDAO bcD = new BookCopiesDAO(con);
+			bcD.create(bc);
+			con.commit();
+		}finally{
+			con.close();
+		}
+		
 	}
 	public void updateBook(Book b)throws Exception{
 		new ConnectionUtils();
@@ -76,7 +124,7 @@ public class AdminstratorService {
 					myCon.rollback();
 					throw new LibraryExceptions("The book doesn't exist");
 				}
-				if(b.getBookTitle() == null || b.getBookTitle().length() < 0 || b.getBookTitle().length() > 45){
+				if(b.getTitle() == null || b.getTitle().length() < 0 || b.getTitle().length() > 45){
 					myCon.rollback();
 					throw new Exception("Book title cannot be empty and needs to be less than 45 characters!");
 				}

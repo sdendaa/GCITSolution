@@ -8,18 +8,14 @@
 %>
 		<div class="modal-content">
 			<form action="editBookLoan" method="post">
-			
-				<input type="text" style="width: 400px;" name="dateOut"
+			CheckOut Date:
+				<input type="Date" style="width: 400px;" name="dateOut"
 					value='<%=b.getCheckOutDate() %>' class="form-control"
-					placeholder="0000-00-00 00:00:00" required autofocus /><br />
-					
-					<input type="text" style="width: 400px;" name="dueDate"
+					placeholder="0000-00-00 " required autofocus /><br />
+					Due Date:
+					<input type="Date" style="width: 400px;" name="dueDate"
 					value='<%=b.getDueDate() %>' class="form-control"
-					placeholder="0000-00-00 00:00:00" required autofocus /><br />
-					
-					<input type="text" style="width: 400px;" name="dateIn"
-					value='<%=b.getCheckInDate() %>' class="form-control"
-					placeholder="0000-00-00 00:00:00" required autofocus /><br />
+					placeholder="0000-00-00 " required autofocus /><br />
 				
 				<input type="hidden" name="bookId" value=<%=bookId%>>
 				<input type="hidden" name="branchId" value=<%=branchId%>>

@@ -2,14 +2,11 @@
  * 
  */
 package libraryApp.entity;
-
-import java.sql.Timestamp;
-import java.util.Date;
-
+import java.sql.Date;
 public class BookLoan implements BaseEntity {
-	private Timestamp dueDate;
-	private Timestamp checkOutDate;
-	private Timestamp CheckInDate;
+	private Date dueDate;
+	private Date checkOutDate;
+	private Date CheckInDate;
 	
 	private Book book;
 	private LibBranch branch;
@@ -40,27 +37,27 @@ public class BookLoan implements BaseEntity {
 	}
 	
 	
-	public Timestamp getDueDate() {
+	public Date getDueDate() {
 		return dueDate;
 	}
 	
-	public void setDueDate(Timestamp dueDate) {
+	public void setDueDate(Date dueDate) {
 		this.dueDate = dueDate;
 	}
 	
-	public Timestamp getCheckOutDate() {
+	public Date getCheckOutDate() {
 		return checkOutDate;
 	}
 	
-	public void setCheckOutDate(Timestamp checkDate) {
-		this.checkOutDate = checkDate;
+	public void setCheckOutDate(Date dateOut) {
+		this.checkOutDate = dateOut;
 	}
 	
-	public Timestamp getCheckInDate() {
+	public Date getCheckInDate() {
 		return CheckInDate;
 	}
 	
-	public void setCheckInDate(Timestamp checkIn) {
+	public void setCheckInDate(Date checkIn) {
 		CheckInDate = checkIn;
 	}
 	

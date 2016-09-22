@@ -4,6 +4,7 @@
 package libraryApp.data;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -81,6 +82,9 @@ public class BookLoanDAO extends BaseDAO<BookLoan> {
 			int branchId = rs.getInt("branchId");
 			int bookId = rs.getInt("bookId");
 			int cardId = rs.getInt("cardNo");
+			Date dateOut = rs.getDate("dateOut");
+			Date dateIn = rs.getDate("dateIn");
+			Date dueDate = rs.getDate("dueDate");
 			Book b = new Book();
 			b.setBookId(bookId);
 			LibBranch br = new LibBranch();
@@ -92,6 +96,9 @@ public class BookLoanDAO extends BaseDAO<BookLoan> {
 			Book bTemp = bookTemp.read(b);
 			LibBranch brTemp = branchTemp.read(br);
 			Borrower borTemp = borrowerTemp.read(bor);
+			bl.setCheckOutDate(dateOut);
+			bl.setCheckInDate(dateIn);
+			bl.setDueDate(dueDate);
 			bl.setBook(bTemp);
 			bl.setBranch(brTemp);
 			bl.setBorrower(borTemp);

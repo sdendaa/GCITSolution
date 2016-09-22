@@ -4,6 +4,7 @@
 package libraryApp.data;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,53 +22,72 @@ public class BookCopiesDAO extends BaseDAO<BookCopies> {
 	private static final String DELETE = "delete from tbl_book_copies where bookId = ? and branchId = ?";
 	private static final String UPDATE = "update tbl_book_copies set noOfCopies = noOfCopies + ? where bookId = ? and branchId = ?";
 	private static final String GET_COUNT = "select count(*) from tbl_book_copies";
-	
+	private static final String GET_NO_COPIES ="SELECT noOfCopies FROM tbl_book_copies"
+			+ " where branchId = ? and bookId = ?";
+
 	private static final String TABLE_NAME = "tbl_book_copies";
 	private static final String KEY_COLUMN = null;
 
 	public BookCopiesDAO(Connection conn) {
 		super(conn);
-		
+
 	}
 
-	
 	@Override
-	public void create(BookCopies copy) throws SQLException {
-				
-		save(INSERT, new Object[]{copy.getBook().getBookId(), copy.getBranch().getBranchId()});
-		
+	public void create(BookCopies copy) throws SQLException {	
+		save(INSERT, new Object[]{copy.getBook().getBookId(), 
+				copy.getBranch().getBranchId(), copy.getNoOfCopies()});
+
 	}
 
 	@Override
 	public void update(BookCopies copy) throws SQLException{
 		save(UPDATE, new Object[]{copy.getNoOfCopies(), copy.getBook().getBookId(), 
 				copy.getBranch().getBranchId()});
-		
+
 	}
 
 	@Override
 	public void delete(BookCopies copy)throws SQLException {
 		save(DELETE, new Object[]{copy.getBook().getBookId(), copy.getBranch().getBranchId()});
-		
+
 	}
 	public Integer getCount() throws SQLException{
 		return getCount(GET_COUNT, new Object[]{});
 	}
+	        
+	public Integer getNoCopyByBranch(int branchId, int bookId) throws SQLException{
+		//ResultSet rs = save(GET_NO_COPIES, new Object[]{branchId, bookId});
+		PreparedStatement pstmt = null;
+		Integer result = null;
+		ResultSet rs = null;
+		try{
+			pstmt = makeStatement(GET_NO_COPIES, new Object[]{branchId, bookId});
+			rs = pstmt.executeQuery();
+			while(rs.next()){
+				result = rs.getInt("noOfCopies");
+			}
+		}finally {
+			if(pstmt != null) pstmt.close();
+		}
+		return result;
+	}
+	
 
 	@Override
 	public BookCopies read(BookCopies bc) throws SQLException {
 		return null;
 	}
-	
+
 	public BookCopies read(int pk1, int pk2) throws SQLException {
 		return read(SELECT_ONE, new Object[]{pk1, pk2});
 	}
-	
+
 	@Override
 	public List<BookCopies> readAll(String sql, Object[] vals) throws SQLException {
 		return readAll(SELECT_ALL, new Object[]{});
 	}
-	
+
 	@Override
 	public List<BookCopies> readResult(ResultSet rs) throws SQLException {
 		List<BookCopies> list = new ArrayList<>();
@@ -75,7 +95,7 @@ public class BookCopiesDAO extends BaseDAO<BookCopies> {
 		BranchDAO branchTemp = new BranchDAO(ConnectionUtils.getConnetion());
 		Book b = new Book();
 		LibBranch br = new LibBranch();
-		
+
 		while(rs.next()){
 			int bookId = rs.getInt("bookId");
 			int branchId = rs.getInt("branchId");
@@ -87,7 +107,7 @@ public class BookCopiesDAO extends BaseDAO<BookCopies> {
 			bc.setNoOfCopies(rs.getInt("noOfCopies"));
 			list.add(bc);
 		}
-		
+
 		return list;
 	}
 	@Override

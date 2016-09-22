@@ -56,6 +56,7 @@
 			<tr>
 				<th>Index</th>
 				<th>Book Title</th>
+			<!-- 	<th>Author Name</th> -->
 				<th>Publisher Name</th>
 				<th>Edit</th>
 				<th>Delete</th>
@@ -66,7 +67,8 @@
 			%>
 			<tr>
 				<td><%=bookList.indexOf(b) %></td>
-				<td><%=b.getBookTitle()%></td>
+				<td><%=b.getTitle()%></td>
+				<%-- <td><%=b.getAuthor().getAuthorName() %></td> --%>
 				<td><%=b.getPublisher().getPublisherName()%></td>
 				<td><button class="btn btn-sm btn-success" data-toggle="modal"
 						data-target="#myModal1"

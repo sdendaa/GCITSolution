@@ -1,11 +1,11 @@
 package libraryApp.cleint;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -17,11 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import libraryApp.entity.Author;
 import libraryApp.entity.Book;
+import libraryApp.entity.BookCopies;
 import libraryApp.entity.BookLoan;
 import libraryApp.entity.Borrower;
 import libraryApp.entity.LibBranch;
 import libraryApp.entity.Publisher;
 import libraryApp.service.AdminstratorService;
+import libraryApp.service.LibrarianService;
 
 /**
  * Servlet implementation class AdministratorServlet
@@ -31,7 +33,7 @@ urlPatterns={"/addAuthor", "/addBranch", "/updateBook", "/searchAuthors","/pageA
 		"/pageBranchs","/pageBorrowers","/searchBranchs","/editBorrower","/deleteBook","/deleteBranch",
 		"/searchBorrowers","/editAuthor","/editPublisher","/editBranch","/deleteAuthor","/deleteBorrower",
 		"/showAllPublishers","/showAllBorrowers","/deletePublisher","/editBookLoan",
-		"/searchBooks", "/searchPublishers", "/pagePublishers",
+		"/searchBooks", "/searchPublishers", "/pagePublishers","/addNoCopiesAdm",
 		"/updateAuthor", "/addPublisher","/addBorrower", "/showAllBooks","/showAllBranchs", "/addBook"})
 public class AdministratorServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -77,7 +79,7 @@ public class AdministratorServlet extends HttpServlet {
 				str.append("</ul>");
 				response.getWriter().append(str);
 				ajax = true;
-				
+
 				break;
 			}
 			case "/pageBooks": {
@@ -117,7 +119,7 @@ public class AdministratorServlet extends HttpServlet {
 				ajax = true;
 				break;
 			}
-			
+
 			default:
 				doPost(request,response);
 				break;
@@ -131,9 +133,9 @@ public class AdministratorServlet extends HttpServlet {
 			RequestDispatcher rd = getServletContext().getRequestDispatcher(forwardPage);
 			rd.forward(request, response);
 		}
-//		
-//		RequestDispatcher rd = getServletContext().getRequestDispatcher(forwardPage);
-//		rd.forward(request, response);
+		//		
+		//		RequestDispatcher rd = getServletContext().getRequestDispatcher(forwardPage);
+		//		rd.forward(request, response);
 	}
 
 	/**
@@ -150,7 +152,12 @@ public class AdministratorServlet extends HttpServlet {
 				request.setAttribute("result", "Author Added Succesfully!");
 				forwardPage = "/showAllAuthors.jsp";
 				break;
-			}			
+			}		
+			case "/addNoCopiesAdm": {
+				addNoCopiesAdm(request);
+				forwardPage = "/showAllBookByBranch.jsp";
+				break;
+			}
 
 			case "/addPublisher": {
 				addPublisher(request);
@@ -169,7 +176,7 @@ public class AdministratorServlet extends HttpServlet {
 				request.setAttribute("result", "Author deleted Succesfully!");
 				break;
 			}
-			
+
 			case "/deleteBranch": {
 				deleteBranch(request);
 				forwardPage = "/showAllBranchs.jsp";
@@ -182,7 +189,7 @@ public class AdministratorServlet extends HttpServlet {
 				request.setAttribute("result", "Author deleted Succesfully!");
 				break;
 			}
-			
+
 			case "/deleteAuthor": {
 				deleteAuthor(request);
 				forwardPage = "/showAllAuthors.jsp";
@@ -192,7 +199,7 @@ public class AdministratorServlet extends HttpServlet {
 
 			case "/addBook": {
 				addBook(request);
-				forwardPage = "/showAllBooks.jsp";
+				forwardPage = "/addNoCopiesAdm.jsp";
 				request.setAttribute("result", "Book Added Succesfully!");
 				break;
 
@@ -218,7 +225,7 @@ public class AdministratorServlet extends HttpServlet {
 				forwardPage = "/showAllBranchs.jsp";
 				break;
 			}
-			
+
 			case "/editBorrower": {
 				editBorrower(request);
 				forwardPage = "/showAllBorrowers.jsp";
@@ -230,7 +237,7 @@ public class AdministratorServlet extends HttpServlet {
 				forwardPage = "/showAllBooks.jsp";
 				break;
 			}
-			
+
 			case "/editPublisher": {
 				editPublisher(request);
 				forwardPage = "/showAllPublishers.jsp";
@@ -283,7 +290,7 @@ public class AdministratorServlet extends HttpServlet {
 				forwardPage = "/showAllBranchs.jsp";
 				break;
 			}
-			
+
 			case "/showAllPublishers": {
 				showAllBranchs(request);
 				forwardPage = "/showAllPublishers.jsp";
@@ -294,7 +301,7 @@ public class AdministratorServlet extends HttpServlet {
 				forwardPage = "/showAllBorrowers.jsp";
 				break;
 			}
-			
+
 			default:
 				break;
 			}
@@ -306,15 +313,32 @@ public class AdministratorServlet extends HttpServlet {
 
 		rd.forward(request, response);
 	}
-;
+	private void addNoCopiesAdm(HttpServletRequest request) throws Exception {
+		String branchId = request.getParameter("branchId");
+		String bookId = request.getParameter("bookId");
+		String noCopy = request.getParameter("noOfCopies");
+		
+		LibBranch br = new LibBranch();
+		br.setBranchId(Integer.parseInt(branchId));
+		Book b = new Book();
+		b.setBookId(Integer.parseInt(bookId));
+		b.setBranch(br);
+		
+		BookCopies bc = new BookCopies();
+		bc.setNoOfCopies(Integer.parseInt(noCopy));
+		bc.setBook(b);
+		bc.setBranch(br);
+	
+		AdminstratorService.getIntance().addNoCopies(bc);
+	}
+
 	private void editBookLoan(HttpServletRequest request) throws Exception {
 		String dateOut = request.getParameter("dateOut");
 		String dueDate = request.getParameter("dueDate");
-		String dateIn = request.getParameter("dateIn");
+//		String dateIn = request.getParameter("dateIn");
 		Integer bookId = Integer.parseInt(request.getParameter("bookId"));
 		Integer branchId = Integer.parseInt(request.getParameter("branchId"));
-		
-		System.out.println(bookId + " " + branchId);
+
 		BookLoan bl = new BookLoan();
 		Book b = new Book();
 		b.setBookId(bookId);
@@ -322,18 +346,18 @@ public class AdministratorServlet extends HttpServlet {
 		br.setBranchId(branchId);
 		bl.setBook(b);
 		bl.setBranch(br);
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-		  Date parsedDateOut = formatter.parse(dateOut);
-		  Date parsedDueDate = formatter.parse(dueDate);
-		  Date parsedDateIn = formatter.parse(dateIn);
-		    Timestamp dateO = new java.sql.Timestamp(parsedDateOut.getTime());
-		    Timestamp dDate = new java.sql.Timestamp(parsedDueDate.getTime());
-		    Timestamp dateI = new java.sql.Timestamp(parsedDateIn.getTime());
-		System.out.println(dateOut+ " string");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		java.util.Date parsedDateOut = formatter.parse(dateOut);
+		java.util.Date parsedDueDate = formatter.parse(dueDate);
+//		java.util.Date parsedDateIn = formatter.parse(dateIn);
+		Date dateO = new Date(parsedDateOut.getTime());
+		Date dDate = new Date(parsedDueDate.getTime());
+//		Date dateI = new Date(parsedDateIn.getTime());
+		
 		bl.setCheckOutDate(dateO);
 		bl.setDueDate(dDate);
-		bl.setCheckInDate(dateI);
-		
+//		bl.setCheckInDate(dateI);
+
 		AdminstratorService.getIntance().udateBookLoan(bl);
 	}
 
@@ -348,7 +372,7 @@ public class AdministratorServlet extends HttpServlet {
 		p.setPublisherAddress(pubAddress);
 		p.setPublisherPhone(pubPhone);
 		AdminstratorService.getIntance().deletePublisher(p);
-		
+
 	}
 
 	private void deleteBorrower(HttpServletRequest request) throws Exception {
@@ -362,7 +386,7 @@ public class AdministratorServlet extends HttpServlet {
 		bo.setBorrowerAddress(borrowerAddress);
 		bo.setBorrowerPhone(borrowerPhone);
 		AdminstratorService.getIntance().deleteBorrower(bo);
-		
+
 	}
 
 	private void deleteBranch(HttpServletRequest request) throws Exception {
@@ -374,17 +398,17 @@ public class AdministratorServlet extends HttpServlet {
 		br.setBranchId(Integer.parseInt(branchId));
 		br.setBranchName(branchName);
 		AdminstratorService.getIntance().deleteBranch(br);
-		
+
 	}
 
 	private void deleteBook(HttpServletRequest request) throws Exception {
 		String bookTitle = request.getParameter("title");
 		String bookId = request.getParameter("bookId");
 		Book b=new Book();
-		b.setBookTitle(bookTitle);
+		b.setTitle(bookTitle);
 		b.setBookId(Integer.parseInt(bookId));
 		AdminstratorService.getIntance().deleteBook(b);
-		
+
 	}
 
 	private void deleteAuthor(HttpServletRequest request) throws Exception {
@@ -394,7 +418,7 @@ public class AdministratorServlet extends HttpServlet {
 		auth.setAuthorName(authorName);
 		auth.setAuthorId(Integer.parseInt(authorId));
 		AdminstratorService.getIntance().deleteAuthor(auth);
-		
+
 	}
 
 	public void editBranch(HttpServletRequest request) throws Exception {
@@ -406,7 +430,7 @@ public class AdministratorServlet extends HttpServlet {
 		br.setBranchName(branchName);
 		br.setBranchAddress(branchAddress);
 		AdminstratorService.getIntance().updateBranch(br);
-		
+
 	}
 
 	private void editBorrower(HttpServletRequest request) throws Exception {
@@ -420,7 +444,7 @@ public class AdministratorServlet extends HttpServlet {
 		bo.setBorrowerAddress(address);
 		bo.setBorrowerPhone(phone);
 		AdminstratorService.getIntance().updateBorrower(bo);
-		
+
 	}
 
 	private void editBook(HttpServletRequest request) throws Exception {
@@ -428,13 +452,13 @@ public class AdministratorServlet extends HttpServlet {
 		String bookTitle = request.getParameter("title");
 		Book  b = new Book();
 		b.setBookId(Integer.parseInt(bookId));
-		b.setBookTitle(bookTitle);
+		b.setTitle(bookTitle);
 		AdminstratorService.getIntance().updateBook(b);
-		
+
 	}
 
 	private void editPublisher(HttpServletRequest request) throws Exception {
-		
+
 		String publisherName = request.getParameter("publisherName");
 		String publisherAddress = request.getParameter("publisherAddress");
 		String publisherPhone = request.getParameter("publisherPhone");
@@ -445,7 +469,7 @@ public class AdministratorServlet extends HttpServlet {
 		pub.setPublisherAddress(publisherAddress);
 		pub.setPublisherPhone(publisherPhone);
 		AdminstratorService.getIntance().updatePublisher(pub);	
-		
+
 	}
 
 	private void editAuthors(HttpServletRequest request) throws Exception {
@@ -455,31 +479,31 @@ public class AdministratorServlet extends HttpServlet {
 		auth.setAuthorName(authorName);
 		auth.setAuthorId(Integer.parseInt(authorId));
 		AdminstratorService.getIntance().updateAuthor(auth);
-		
+
 	}
 
 	private void searchPublishers(HttpServletRequest request) throws Exception {
 		String searchString = request.getParameter("searchString");
 		request.setAttribute("pubList", AdminstratorService.getIntance().getAllPublishers(1, searchString));
-		
+
 	}
 
 	private void searchBorrowers(HttpServletRequest request)throws Exception {
 		String searchString = request.getParameter("searchString");
 		request.setAttribute("borrowers", AdminstratorService.getIntance().getAllBorrowers(1, searchString));
-		
+
 	}
 
 	public void searchBranchs(HttpServletRequest request) throws Exception{
 		String searchString = request.getParameter("searchString");
 		request.setAttribute("branchs", AdminstratorService.getIntance().getAllBranchs(1, searchString));
-		
+
 	}
 
 	private void searchBooks(HttpServletRequest request) throws Exception {
 		String searchString = request.getParameter("searchString");
 		request.setAttribute("books", AdminstratorService.getIntance().getAllBooks(1, searchString));
-		
+
 	}
 
 	public void showAllBranchs(HttpServletRequest request) throws SQLException {
@@ -489,17 +513,17 @@ public class AdministratorServlet extends HttpServlet {
 		if(branchs != null){
 			request.setAttribute("branchs", branchs);
 		}
-		
+
 	}
-private void showAllBorrowers(HttpServletRequest request) throws SQLException {
-	List<Borrower> borrowers = new ArrayList<>();
-	int pageNo = Integer.parseInt(request.getParameter("pageNo"));
-	 borrowers = AdminstratorService.getIntance().getAllBorrowers(pageNo, null);
-	if(borrowers != null){
-		request.setAttribute("borrowers", borrowers);
+	private void showAllBorrowers(HttpServletRequest request) throws SQLException {
+		List<Borrower> borrowers = new ArrayList<>();
+		int pageNo = Integer.parseInt(request.getParameter("pageNo"));
+		borrowers = AdminstratorService.getIntance().getAllBorrowers(pageNo, null);
+		if(borrowers != null){
+			request.setAttribute("borrowers", borrowers);
+		}
+
 	}
-	
-}
 
 	private void searchAuthors(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String searchString = request.getParameter("searchString");
@@ -511,7 +535,7 @@ private void showAllBorrowers(HttpServletRequest request) throws SQLException {
 		List<Author> authors = new ArrayList<Author>();
 		authors = admService.getAllAuthors(pageNo, searchString);
 		request.setAttribute("authors", authors);
-		
+
 		StringBuffer str = new StringBuffer();
 		str.append("<tr><th>#</th><th>Author Name</th><th>Edit</th><th>Delete</th></tr>");
 		for(Author a: authors){
@@ -561,7 +585,7 @@ private void showAllBorrowers(HttpServletRequest request) throws SQLException {
 		String title = request.getParameter("bookTitle");
 		Book b = new Book();
 		Author a = new Author();
-		b.setBookTitle(title);
+		b.setTitle(title);
 		AdminstratorService.getIntance().updateAuthor(a);
 		AdminstratorService.getIntance().updateBook(b);
 
@@ -581,26 +605,33 @@ private void showAllBorrowers(HttpServletRequest request) throws SQLException {
 	}
 
 	private void addBook(HttpServletRequest request) throws Exception {
-		
+
 		String title = request.getParameter("bookTitle");
 		String authorId = request.getParameter("authorId");
 		String pubId = request.getParameter("pubId");
-
+		String branchId = request.getParameter("branchId");
 		Book b = new Book();
 		Author a = new Author();
 		Publisher p = new Publisher();
+		LibBranch br = new LibBranch();
+		BookCopies bc = new BookCopies();
 
-		b.setBookTitle(title);
+		b.setTitle(title);
 		a.setAuthorId(Integer.parseInt(authorId));
 		p.setPublisherId(Integer.parseInt(pubId));
+		br.setBranchId(Integer.parseInt(branchId));
+		bc.setNoOfCopies(1);
+		bc.setBook(b);
+		bc.setBranch(br);
 
 		b.setAuthor(a);;
 		b.setPublisher(p);
-
-		AdminstratorService.getIntance().addBook(b);
-
-		//		AdminstratorService admService = new AdminstratorService();
-		//		admService.addBook(b);
+		b.setBranch(br);
+		Integer bookId=AdminstratorService.getIntance().addAndGetBookId(b);
+		if(bookId!=0){
+			b.setBookId(bookId);
+		}
+		request.setAttribute("book", b);
 	}
 
 	private void addAuthor(HttpServletRequest request) throws Exception {
@@ -623,7 +654,7 @@ private void showAllBorrowers(HttpServletRequest request) throws SQLException {
 	private void showAllPublishers(HttpServletRequest request) throws Exception {
 		Integer pageNo= Integer.parseInt(request.getParameter("pageNo"));
 		List<Publisher> pubList = new ArrayList<>();
-				pubList = AdminstratorService.getIntance().getAllPublishers(pageNo, null);
+		pubList = AdminstratorService.getIntance().getAllPublishers(pageNo, null);
 		if(pubList != null){
 			request.setAttribute("pubList", pubList);
 		}
@@ -645,5 +676,5 @@ private void showAllBorrowers(HttpServletRequest request) throws SQLException {
 			request.setAttribute("loans", loans);
 		}
 	}
-	
+
 }

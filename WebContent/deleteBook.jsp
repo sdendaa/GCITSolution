@@ -8,7 +8,7 @@
 		<div class="modal-content">
 			<form action="deleteBook" method="post">
 				<input type="text" style="width: 600px;" name="tilte"
-					value=' You are about to delete <%=b.getBookTitle()%>. Do you want to submit?'  /><br />
+					value=' You are about to delete <%=b.getTitle()%>. Do you want to submit?'  /><br />
 				<input type="hidden" name="bookId" value=<%=b.getBookId()%>>
 				<input type="submit" class="btn btn-primary" />
 				<a href="http://localhost:8080/LibraryWebApp/index.jsp" >Cancel</a>

@@ -195,8 +195,7 @@ public class LibrarianServlet extends HttpServlet {
 		bc.setBook(b);
 		bc.setBranch(br);
 		bc.setNoOfCopies(newNo+originNo);
-		LibrarianService ls = new LibrarianService();
-		ls.AddBookCopies(bc);
+		AdminstratorService.getIntance().addNoCopies(bc);
 
 	}
 	private void showAllBooksByBranch(HttpServletRequest request) throws Exception {

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import libraryApp.entity.Author;
 import libraryApp.entity.Book;
 import libraryApp.entity.Publisher;
 
@@ -41,6 +42,8 @@ public class BookDAO extends BaseDAO<Book> {
 			+ " join tbl_book_loans bl on b.bookId = bl.bookId"
 			+ " join tbl_library_branch br on bl.branchId = bl.branchId"
 			+ " where br.branchId = ? and bl.cardNo = ?";
+	private static final String INSERT_BA = "insert into tbl_book_authors (bookId, authorId) values (?,?)";
+	private static final String INSERT_Book_Author = "insert into tbl_book_authors(bookId, authorId) values (?,?)";
 
 
 	public BookDAO(Connection conn) {
@@ -50,13 +53,23 @@ public class BookDAO extends BaseDAO<Book> {
 	
 	@Override
 	public void create(Book book) throws SQLException {
-		save(INSERT, new Object[]{book.getBookTitle(),  book.getPublisher().getPublisherId()});
+		save(INSERT, new Object[]{book.getTitle(),  book.getPublisher().getPublisherId()});
+		
+	}
+
+	public Integer createAndGetId(Book book) throws SQLException {
+		return saveAndGetId(INSERT, new Object[]{book.getTitle(),  book.getPublisher().getPublisherId()});
+		
+	}
+	
+	public void createBookAuthor(Book b) throws SQLException {
+		save(INSERT_Book_Author, new Object[]{b.getBookId(),  b.getAuthor().getAuthorId()});
 		
 	}
 
 	@Override
 	public void update(Book book) throws SQLException{
-		save(UPDATE, new Object[]{book.getBookTitle(), book.getBookId()});
+		save(UPDATE, new Object[]{book.getTitle(), book.getBookId()});
 		 
 	}
 
@@ -102,7 +115,7 @@ public class BookDAO extends BaseDAO<Book> {
 			pu.setPublisherId(publId);
 			
 			bo.setBookId(rs.getInt("bookId"));
-			bo.setBookTitle(rs.getString("title"));
+			bo.setTitle(rs.getString("title"));
 			bo.setPublisher(publTemp.read(pu));
 			list.add(bo);
 		}
@@ -140,6 +153,10 @@ public class BookDAO extends BaseDAO<Book> {
 
 	public List<Book> getAllBooksBorrowedByBranch(Integer branchId, Integer cardNo) throws SQLException {
 		return readAll(SELECT_BORROWED_BOOK, new Object[]{branchId, cardNo});
+	}
+
+	public void create(Book b, Author a) throws SQLException {
+		save(INSERT_BA, new Object[]{b.getBookId(),  a.getAuthorId()});
 	}
 	
 }

@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.mysql.jdbc.Statement;
+
 import libraryApp.entity.BaseEntity;
 
 
@@ -49,6 +51,24 @@ public abstract class BaseDAO<BaseEntity> {
 	protected void save(String sql,Object[] vals) throws SQLException {
 		PreparedStatement stmt = makeStatement(sql, vals);
 		stmt.executeUpdate();
+	}
+
+	protected Integer saveAndGetId(String sql,Object[] vals) throws SQLException {
+		PreparedStatement stmt= conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		ResultSet rs=null;
+		int lastInsertId=-1;
+		int idx = 1;
+		for(Object o : vals) {
+			stmt.setObject(idx, o);
+			idx++;
+		}
+		stmt.executeUpdate();
+		rs=stmt.getGeneratedKeys();
+
+		if (rs.next()) {
+			lastInsertId = rs.getInt(1);
+		} 
+		return lastInsertId;
 	}
 
 	public BaseEntity read(String sql, Object[] vals) throws SQLException{

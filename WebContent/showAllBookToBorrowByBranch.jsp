@@ -17,13 +17,13 @@ List<Book> books = libSer.getAllBooksFromBranch(branchId, null, null);
 <table class="table" frame="box" rules="none">
 	<tr>
 		<th>Book Title</th>
-		
+		<th>Number of copies</th>
 		<th>checkout Book</th>
 	</tr>
 	<%for(Book b: books){ %>
 	<tr>
 		<td><%out.println(b.getBookTitle()); %></td>
-	
+		<td><%out.println(libSer.getNoOfCopyByBranch(branchId, b.getBookId())    ); %></td>
 <td>
 				<input type="hidden" name="bookId" value=<%=b.getBookId()%>>
 				<input type="hidden" name="cardNo" value=<%=cardNo%>>
